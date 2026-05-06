@@ -1,0 +1,32 @@
+{% extends 'stolovaya/base.html' %}
+
+{% block title %}Заказ №{{ order.id }}{% endblock %}
+
+{% block content %}
+<h1>Заказ №{{ order.id }}</h1>
+<p>Дата: {{ order.created|date:"d.m.Y H:i" }}</p>
+<p>Статус: {{ order.get_status_display }}</p>
+<p>ФИО: {{ order.full_name }}</p>
+<p>Адрес: {{ order.address }}</p>
+<p>Телефон: {{ order.phone }}</p>
+<p>Email: {{ order.email }}</p>
+
+<h3>Состав заказа</h3>
+<table class="table table-sm">
+    <thead>
+        <tr><th>Блюдо</th><th>Кол-во</th><th>Цена</th><th>Сумма</th></tr>
+    </thead>
+    <tbody>
+        {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.dish.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }} ₽</td>
+                <td>{{ item.get_cost }} ₽</td>
+            </tr>
+        {% endfor %}
+        <tr class="fw-bold"><td colspan="3">Итого</td><td>{{ order.total_price }} ₽</td></tr>
+    </tbody>
+</table>
+<a href="{% url 'stolovaya:order_list' %}" class="btn btn-secondary">Назад к заказам</a>
+{% endblock %}

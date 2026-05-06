@@ -1,0 +1,91 @@
+{% extends 'stolovaya/base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if selected_category %}{{ selected_category.name }}{% else %}Меню{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="hero fade-up">
+    <h1>Домашние блюда с любовью</h1>
+    <p>Натуральные продукты, как у бабушки ✨</p>
+</div>
+
+<!-- Категории из БД -->
+<div class="categories-row" id="categoryList">
+    <div class="category-chip {% if not selected_category %}active{% endif %}" data-cat-slug="">
+        <i class="fas fa-fire"></i> Все
+    </div>
+    {% for cat in categories %}
+        <div class="category-chip {% if selected_category and selected_category.id == cat.id %}active{% endif %}" data-cat-slug="{{ cat.slug }}">
+            {{ cat.name }}
+        </div>
+    {% endfor %}
+</div>
+
+<div class="section-title fade-up" style="animation-delay: 0.05s;">
+    🍲 {% if selected_category %}{{ selected_category.name }}{% else %}Все блюда{% endif %}
+</div>
+
+<div class="dishes-grid" id="dishesContainer">
+    {% for dish in dishes %}
+        <div class="dish-card" style="animation-delay: {{ forloop.counter0|divisibleby:2|yesno:"0.05s,0.1s" }};">
+            <div class="card-img">
+                {% if dish.image %}
+                    <img src="{{ dish.image.url }}" alt="{{ dish.name }}" style="width:100%; height:100%; object-fit:cover;">
+                {% else %}
+                    <span style="font-size: 4rem;">🍽️</span>
+                {% endif %}
+            </div>
+            <div class="card-info">
+                <div class="dish-category">{{ dish.category.name|default:"Без категории" }}</div>
+                <div class="dish-name">
+                    <a href="{% url 'stolovaya:dish_detail' dish.slug %}">{{ dish.name }}</a>
+                </div>
+                <div class="dish-desc">{{ dish.description|truncatewords:15 }}</div>
+                <div class="price-row">
+                    <span class="price">{{ dish.price }} ₽</span>
+                    <button class="add-to-cart" data-id="{{ dish.id }}" data-name="{{ dish.name }}">
+                        <i class="fas fa-cart-plus"></i> В корзину
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-cats">
+            <i class="fas fa-egg" style="font-size: 3rem; color:#e67e22;"></i>
+            <p>В этой категории пока нет блюд.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // AJAX добавление в корзину (подключаем через кнопки)
+    document.querySelectorAll('.add-to-cart').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dishId = this.getAttribute('data-id');
+            const dishName = this.getAttribute('data-name');
+            addToCart(dishId, dishName);
+            // анимация кнопки
+            this.style.transform = "scale(0.95)";
+            setTimeout(() => { this.style.transform = ""; }, 150);
+        });
+    });
+    
+    // Фильтрация по категориям (без перезагрузки)
+    const chips = document.querySelectorAll('.category-chip');
+    chips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            const slug = this.getAttribute('data-cat-slug');
+            let url = "{% url 'stolovaya:dish_list' %}";
+            if (slug) {
+                url = "{% url 'stolovaya:dish_list_by_category' '____' %}".replace('____', slug);
+            }
+            window.location.href = url; // переходим на категорию (просто, с сохранением функционала)
+        });
+    });
+</script>
+{% endblock %}

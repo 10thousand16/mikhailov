@@ -1,0 +1,14 @@
+{% extends 'stolovaya/base.html' %}
+
+{% block title %}Удаление блюда{% endblock %}
+
+{% block content %}
+<div class="alert alert-danger">
+    <h4>Вы уверены, что хотите удалить блюдо "{{ dish.name }}"?</h4>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Да, удалить</button>
+        <a href="{% url 'stolovaya:dish_detail' dish.slug %}" class="btn btn-secondary">Отмена</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Столовая Moya{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #fefaf5;
+            color: #2e241f;
+            scroll-behavior: smooth;
+        }
+        /* Анимация появления */
+        .fade-up {
+            animation: fadeUp 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Header */
+        .header {
+            background: #ffffffdd;
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #ffe5d9;
+        }
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo a {
+            font-weight: 700;
+            font-size: 1.7rem;
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 500;
+            color: #3b2a22;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-links a:hover { color: #e67e22; }
+        .cart-link {
+            background: #fef0e6;
+            padding: 0.4rem 1rem;
+            border-radius: 60px;
+        }
+        .cart-link:hover {
+            background: #e67e22;
+            color: white !important;
+        }
+        /* Main */
+        .main {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 2rem 3rem;
+        }
+        /* Категории */
+        .categories-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 2rem 0 1rem;
+            justify-content: center;
+        }
+        .category-chip {
+            background: #fff3ed;
+            padding: 0.5rem 1.3rem;
+            border-radius: 60px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #ffe0d2;
+        }
+        .category-chip.active {
+            background: #e67e22;
+            color: white;
+            border-color: #e67e22;
+        }
+        .category-chip:hover {
+            background: #e67e22;
+            color: white;
+            transform: scale(1.02);
+        }
+        /* Секция */
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            border-left: 6px solid #e67e22;
+            padding-left: 1.2rem;
+        }
+        /* Сетка карточек */
+        .dishes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        .dish-card {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: cardAppear 0.5s ease backwards;
+        }
+        @keyframes cardAppear {
+            from { opacity: 0; transform: scale(0.96) translateY(12px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .dish-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 22px 35px rgba(0,0,0,0.1);
+        }
+        .card-img {
+            height: 190px;
+            background: linear-gradient(145deg, #f7e9df, #fef1e8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            transition: transform 0.4s;
+        }
+        .dish-card:hover .card-img {
+            transform: scale(1.02);
+        }
+        .card-info {
+            padding: 1.4rem;
+        }
+        .dish-category {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #e67e22;
+            font-weight: 600;
+        }
+        .dish-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0.4rem 0;
+        }
+        .dish-name a {
+            text-decoration: none;
+            color: inherit;
+        }
+        .dish-name a:hover {
+            color: #e67e22;
+        }
+        .dish-desc {
+            color: #7a6657;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        .price {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: #d35400;
+        }
+        .add-to-cart {
+            background: #f7e9e0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e67e22;
+        }
+        .add-to-cart:hover {
+            background: #e67e22;
+            color: white;
+        }
+        /* уведомление */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2e241f;
+            color: #fff3e8;
+            padding: 12px 24px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: opacity 0.2s, transform 0.3s;
+            pointer-events: none;
+        }
+        .toast-notify.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        footer {
+            text-align: center;
+            border-top: 1px solid #ffe7dd;
+            padding: 2rem;
+            margin-top: 2rem;
+            color: #ad8a72;
+        }
+        @media (max-width: 740px) {
+            .nav-container { flex-direction: column; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo"><a href="{% url 'stolovaya:dish_list' %}">Столовая</a></div>
+            <div class="nav-links">
+                <a href="{% url 'stolovaya:dish_list' %}"><i class="fas fa-utensils"></i> Меню</a>
+                <a href="{% url 'stolovaya:order_list' %}"><i class="fas fa-clipboard-list"></i> Заказы</a>
+                <a href="{% url 'stolovaya:cart_detail' %}" class="cart-link" id="cartIconBtn">
+                    <i class="fas fa-shopping-basket"></i> Корзина
+                    <span id="cartCountBadge" style="background:#e67e22; border-radius:20px; padding:0px 8px; margin-left:4px; color:white;">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>© 2026 Столовая | Версия как дома ❤️</p>
+    </footer>
+
+    <div id="cartToast" class="toast-notify">
+        <i class="fas fa-check-circle" style="color:#e67e22;"></i> <span>Добавлено в корзину</span>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Функция для обновления счетчика корзины (через API)
+        function updateCartCount() {
+            fetch("{% url 'stolovaya:cart_count' %}")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cartCountBadge').innerText = data.count;
+                });
+        }
+        // Показ уведомления
+        function showToast(message) {
+            const toast = document.getElementById("cartToast");
+            toast.querySelector("span").innerText = message;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 1800);
+        }
+        // AJAX добавление в корзину
+        function addToCart(dishId, dishName) {
+            fetch("{% url 'stolovaya:add_to_cart_ajax' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ dish_id: dishId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    showToast(`🍲 ${dishName} добавлено в корзину`);
+                    updateCartCount();
+                } else {
+                    showToast("Ошибка: " + (data.message || ""));
+                }
+            });
+        }
+        // Получение CSRF токена
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        // Обновить количество при загрузке
+        document.addEventListener("DOMContentLoaded", function() {
+            updateCartCount();
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

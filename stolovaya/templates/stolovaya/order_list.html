@@ -1,0 +1,20 @@
+{% extends 'stolovaya/base.html' %}
+
+{% block title %}Мои заказы{% endblock %}
+
+{% block content %}
+<h1>Мои заказы</h1>
+<div class="list-group">
+    {% for order in orders %}
+        <a href="{% url 'stolovaya:order_detail' order.id %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">Заказ №{{ order.id }}</h5>
+                <small>{{ order.created|date:"d.m.Y H:i" }}</small>
+            </div>
+            <p class="mb-1">Сумма: {{ order.total_price }} ₽, статус: {{ order.get_status_display }}</p>
+        </a>
+    {% empty %}
+        <p>У вас ещё нет заказов.</p>
+    {% endfor %}
+</div>
+{% endblock %}

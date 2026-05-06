@@ -1,0 +1,82 @@
+{% extends 'stolovaya/base.html' %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+<div class="hero fade-up">
+    <h1>🛒 Ваша корзина</h1>
+    <p>Проверьте заказ и оформите доставку</p>
+</div>
+
+{% if cart|length > 0 %}
+    <div class="cart-container" style="background: white; border-radius: 28px; padding: 2rem; box-shadow: 0 12px 28px rgba(0,0,0,0.05);">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #ffe0d2; text-align: left;">
+                        <th style="padding: 1rem 0.5rem;">Блюдо</th>
+                        <th style="padding: 1rem 0.5rem;">Количество</th>
+                        <th style="padding: 1rem 0.5rem;">Цена</th>
+                        <th style="padding: 1rem 0.5rem;">Сумма</th>
+                        <th style="padding: 1rem 0.5rem;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    <tr style="border-bottom: 1px solid #f0e4da;">
+                        <td style="padding: 1rem 0.5rem; font-weight: 500;">{{ item.dish.name }}</td>
+                        <td style="padding: 1rem 0.5rem;">{{ item.quantity }}</td>
+                        <td style="padding: 1rem 0.5rem;">{{ item.price }} ₽</td>
+                        <td style="padding: 1rem 0.5rem; font-weight: 600;">{{ item.total_price }} ₽</td>
+                        <td style="padding: 1rem 0.5rem;">
+                            <a href="{% url 'stolovaya:remove_from_cart' item.dish.id %}" class="remove-item" style="background: none; border: none; color: #e67e22; cursor: pointer; text-decoration: none; font-size: 1.2rem;">
+                                <i class="fas fa-trash-alt"></i> Удалить
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr style="border-top: 2px solid #ffe0d2;">
+                        <td colspan="3" style="padding: 1rem 0.5rem; font-size: 1.2rem; font-weight: 700;">Итого:</td>
+                        <td colspan="2" style="padding: 1rem 0.5rem; font-size: 1.4rem; font-weight: 800; color: #d35400;">{{ cart.get_total_price }} ₽</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        <div class="cart-actions" style="display: flex; gap: 1rem; justify-content: space-between; margin-top: 2rem; flex-wrap: wrap;">
+            <a href="{% url 'stolovaya:dish_list' %}" class="cart-btn" style="background: #f7e9e0; color: #e67e22; padding: 0.8rem 1.8rem; border-radius: 60px; text-decoration: none; font-weight: 600; transition: 0.2s;">
+                <i class="fas fa-arrow-left"></i> Продолжить покупки
+            </a>
+            <a href="{% url 'stolovaya:create_order' %}" class="cart-btn" style="background: #e67e22; color: white; padding: 0.8rem 1.8rem; border-radius: 60px; text-decoration: none; font-weight: 600; transition: 0.2s;">
+                Оформить заказ <i class="fas fa-check"></i>
+            </a>
+        </div>
+    </div>
+{% else %}
+    <div class="empty-cart" style="text-align: center; background: white; border-radius: 28px; padding: 3rem; box-shadow: 0 12px 28px rgba(0,0,0,0.05);">
+        <i class="fas fa-shopping-basket" style="font-size: 4rem; color: #e67e22; margin-bottom: 1rem;"></i>
+        <h3>Корзина пуста</h3>
+        <p>Добавьте блюда из меню, чтобы оформить заказ.</p>
+        <a href="{% url 'stolovaya:dish_list' %}" class="cart-btn" style="display: inline-block; margin-top: 1rem; background: #e67e22; color: white; padding: 0.8rem 1.8rem; border-radius: 60px; text-decoration: none; font-weight: 600;">
+            Перейти в меню
+        </a>
+    </div>
+{% endif %}
+
+<style>
+    /* дополнительные стили для кнопок при наведении */
+    .cart-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(230, 126, 34, 0.2);
+    }
+    .remove-item:hover i {
+        color: #c0392b;
+    }
+    @media (max-width: 640px) {
+        .cart-actions { flex-direction: column; align-items: stretch; }
+        .cart-actions a { text-align: center; }
+    }
+</style>
+{% endblock %}
